@@ -1,12 +1,13 @@
-export default function Project({ project, setLikes }) {
+import React, { useState } from "react";
+
+export default function Project({ project, setLikes, isUpdating }) {
   const style = {
     fontSize: `${project.fs + project.likes}pt`,
     transition: "all 1s",
   };
 
-  const onButtonClick = () => {
-    setLikes(project.likes + 1);
-    console.log("project.likes", project.likes);
+  const onButtonClick = async () => {
+    await setLikes(project.likes + 1);
   };
 
   return (
@@ -15,7 +16,9 @@ export default function Project({ project, setLikes }) {
         {project.name} : {project.value}
       </li>
       Likes : {project.likes}
-      <button onClick={onButtonClick}>Like</button>
+      <button onClick={onButtonClick} disabled={isUpdating}>
+        {isUpdating ? "Updating..." : "Like"}
+      </button>
     </div>
   );
 }
