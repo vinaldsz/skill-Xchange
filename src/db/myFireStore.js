@@ -81,8 +81,4 @@ function MyFireStoreHandler() {
 
 const myDB = new MyFireStoreHandler();
 
-console.log("Getting projects");
-const projects = await myDB.getProjects();
-console.log("got projects", projects);
-
 export { myDB };

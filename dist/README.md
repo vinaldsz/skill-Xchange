@@ -1,1 +1,0 @@
-# reactFirestore-project-analyzer
