@@ -6,6 +6,7 @@ import AboutPage from "./pages/AboutPage.jsx";
 import UserPage from "./pages/UserPage.jsx";
 import SignInPage from "./pages/SignInPage.jsx";
 import { EmailProvider } from "./contexts/EmailContext.jsx";
+import SignUpPage from "./pages/SignUpPage.jsx";
 
 import { BrowserRouter, Routes, Route } from "react-router";
 
@@ -23,6 +24,7 @@ const App = () => {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/user" element={<UserPage />} />
             <Route path="/signin" element={<SignInPage />} />
+            <Route path="/signup" element={<SignUpPage />} />
           </Routes>
         </BrowserRouter>
       </EmailProvider>

@@ -101,6 +101,18 @@ class MyFireStoreHandler {
     }
   }
 
+  async addUser(user) {
+    try {
+      const usersCol = collection(this.db, "user");
+      const docRef = await addDoc(usersCol, user); // Add user data to Firestore
+      console.log("User added with ID:", docRef.id);
+      return { id: docRef.id, ...user }; // Return the added user with ID
+    } catch (error) {
+      console.error("Error adding user:", error);
+      throw error;
+    }
+  }
+
   // ✅ Add a new skill to Firestore
   async addSkill(skill) {
     try {
