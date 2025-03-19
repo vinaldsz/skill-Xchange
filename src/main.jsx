@@ -3,18 +3,31 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import HomePage from "./pages/HomePage.jsx";
 import AboutPage from "./pages/AboutPage.jsx";
+import UserPage from "./pages/UserPage.jsx";
+import SignInPage from "./pages/SignInPage.jsx";
+import { EmailProvider } from "./contexts/EmailContext.jsx";
 
 import { BrowserRouter, Routes, Route } from "react-router";
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+import "bootstrap/dist/css/bootstrap.min.css";
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/about" element={<AboutPage />} />
-      </Routes>
-    </BrowserRouter>
-  </StrictMode>
-);
+const App = () => {
+  return (
+    <StrictMode>
+      <EmailProvider>
+        {" "}
+        {/* Wrap the app with EmailProvider */}
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/user" element={<UserPage />} />
+            <Route path="/signin" element={<SignInPage />} />
+          </Routes>
+        </BrowserRouter>
+      </EmailProvider>
+    </StrictMode>
+  );
+};
+
+createRoot(document.getElementById("root")).render(<App />);

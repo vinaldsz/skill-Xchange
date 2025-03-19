@@ -1,84 +1,148 @@
-// Import the functions you need from the SDKs you need
+// Import the necessary Firebase functions
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
   collection,
   getDocs,
-  doc,
+  addDoc,
   updateDoc,
+  doc,
+  deleteDoc,
+  query,
+  where,
 } from "firebase/firestore/lite";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-function MyFireStoreHandler() {
-  console.log("🐣 MyFireStoreHandler");
-  const myFireStore = {};
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyA3Dwh7sk-ufzTMLZrj8ljeA1wt0Dkde8M",
-    authDomain: "doge-analyzer.firebaseapp.com",
-    projectId: "doge-analyzer",
-    storageBucket: "doge-analyzer.firebasestorage.app",
-    messagingSenderId: "10399879569",
-    appId: "1:10399879569:web:faa843f530dc01deff4a30",
-  };
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAJPnH4coSCLvxbSnJlTpf-L0bZyfqkZeI",
+  authDomain: "skill-exchange-73c3c.firebaseapp.com",
+  projectId: "skill-exchange-73c3c",
+  storageBucket: "skill-exchange-73c3c.firebasestorage.app",
+  messagingSenderId: "956270753054",
+  appId: "1:956270753054:web:ea0ac43914f9046d64050f",
+};
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  const db = getFirestore(app);
+class MyFireStoreHandler {
+  constructor() {
+    this.db = db;
+    this.skillsPromise = null;
+  }
 
-  let projectsPromise = null;
+  // ✅ Check if the email exists in Firestore
+  async checkIfEmailExists(email) {
+    try {
+      console.log("Checking if email exists...");
+      const usersCol = collection(this.db, "user"); // Ensure 'users' is the correct collection name
+      const q = query(usersCol, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
 
-  async function getProjectsPromise() {
-    if (projectsPromise) {
-      return projectsPromise;
+      return !querySnapshot.empty; // ✅ Returns true if email exists
+    } catch (error) {
+      console.error("Error checking email:", error);
+      throw error;
+    }
+  }
+
+  async getUserByEmail(email) {
+    try {
+      console.log("Getting user by email...");
+      const usersCol = collection(this.db, "user");
+      const q = query(usersCol, where("email", "==", email));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.log("No matching documents.");
+        return null;
+      }
+
+      // Return the user data along with the document ID (user_id)
+      const userDoc = querySnapshot.docs[0];
+      const user = { id: userDoc.id, ...userDoc.data() }; // Add doc.id as user_id
+      console.log("User data with ID:", user);
+      return user;
+    } catch (error) {
+      console.error("Error getting user by email:", error);
+      throw error;
+    }
+  }
+
+  // ✅ Get skills with caching to avoid repeated calls
+  async getSkillsPromise() {
+    if (this.skillsPromise) {
+      console.log("Returning cached skillsPromise");
+      return this.skillsPromise.then((snapshot) =>
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+      );
     }
 
     try {
-      const projectsCol = collection(db, "projects");
-      projectsPromise = await getDocs(projectsCol);
-      return projectsPromise;
+      console.log("Fetching skills from Firestore...");
+      const skillsCol = collection(this.db, "skills");
+      this.skillsPromise = getDocs(skillsCol); // Store the promise
+      const skillsSnapshot = await this.skillsPromise;
+      const skillsList = skillsSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      return skillsList;
     } catch (error) {
-      console.error("Error getting projects:", error);
+      console.error("Error getting skills:", error);
       throw error;
     } finally {
-      projectsPromise = null;
+      this.skillsPromise = null; // Reset the cache if needed
     }
   }
 
-  // Get a list of cities from your database
-  async function getProjects() {
-    console.log("✅ myDB.getProjects", projectsPromise);
-    const projectSnapshot = await getProjectsPromise();
-    console.log("projectSnapshot", projectSnapshot);
-
-    const projectList = projectSnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    return projectList;
-  }
-
-  async function updateProject(projectId, project) {
-    console.log("updating project", projectId, project);
+  // ✅ Add a new skill to Firestore
+  async addSkill(skill) {
     try {
-      const projectRef = doc(db, "projects", projectId);
-      await updateDoc(projectRef, project);
-      return { success: true };
+      const skillsCol = collection(this.db, "skills");
+      const { id, ...skillWithoutId } = skill; // Remove ID to avoid duplication
+      const docRef = await addDoc(skillsCol, skillWithoutId);
+      await updateDoc(docRef, { id: docRef.id }); // Set ID after adding
+      console.log("Skill added with ID:", docRef.id);
+      return { id: docRef.id, ...skillWithoutId };
     } catch (error) {
-      console.error("Error updating project:", error);
+      console.error("Error adding skill:", error);
       throw error;
     }
   }
 
-  myFireStore.getProjects = getProjects;
-  myFireStore.updateProject = updateProject;
-  myFireStore.db = db;
+  // ✅ Update an existing skill
+  async updateSkill(skillId, updatedSkill) {
+    try {
+      const skillRef = doc(this.db, "skills", skillId);
+      await updateDoc(skillRef, updatedSkill);
+      return { id: skillId, ...updatedSkill };
+    } catch (error) {
+      console.error("Error updating skill:", error);
+      throw error;
+    }
+  }
 
-  return myFireStore;
+  // ✅ Delete a skill by ID
+  async deleteSkill(skillId) {
+    try {
+      const skillRef = doc(this.db, "skills", skillId);
+      await deleteDoc(skillRef);
+      console.log("Skill deleted with ID:", skillId);
+      return { success: true, id: skillId };
+    } catch (error) {
+      console.error("Error deleting skill:", error);
+      throw error;
+    }
+  }
 }
 
+// ✅ Create an instance of the Firestore handler
 const myDB = new MyFireStoreHandler();
 
 export { myDB };
