@@ -28,12 +28,12 @@ export default function SkillsList() {
       // Fetch user_id based on the email
       const fetchUserId = async () => {
         try {
+          console.log("email in SkillList:", email);
           const user = await myDB.getUserByEmail(email); // Function to get user by email
           if (user) {
             const userId = user.id; // Get user ID from the Firestore document ID
             console.log("User ID:", userId);
             setUserId(userId); // Set userId in state
-            fetchSkills(userId); // Fetch skills for this user
           } else {
             console.error("User not found.");
           }
@@ -45,6 +45,13 @@ export default function SkillsList() {
       fetchUserId();
     }
   }, [email]); // Only re-fetch when the email changes
+
+  // Fetch skills only when userId is set
+  useEffect(() => {
+    if (userId) {
+      fetchSkills(userId); // Fetch skills once userId is available
+    }
+  }, [userId]); // Depend on userId to trigger fetching skills
 
   const handleEdit = (skill) => {
     setEditingSkill(skill); // Set the selected skill for editing

@@ -4,6 +4,7 @@ import {
   getFirestore,
   collection,
   getDocs,
+  getDoc,
   addDoc,
   updateDoc,
   doc,
@@ -69,6 +70,24 @@ class MyFireStoreHandler {
       throw error;
     }
   }
+  async getUserById(userId) {
+    try {
+      console.log("Getting user by ID...");
+      console.log("User ID:", userId);
+      const userDoc = doc(this.db, "user", userId); // ✅ Correct usage
+      const userSnapshot = await getDoc(userDoc); // ⛔ Should be getDoc, not getDocs!
+
+      if (!userSnapshot.exists()) {
+        console.log("No user found with ID:", userId);
+        return null;
+      }
+
+      return { id: userSnapshot.id, ...userSnapshot.data() }; // ✅ Correct way to return
+    } catch (error) {
+      console.error("Error getting user by ID:", error);
+      throw error;
+    }
+  }
 
   // ✅ Get skills with caching to avoid repeated calls
   async getSkillsPromise() {
@@ -105,7 +124,7 @@ class MyFireStoreHandler {
     try {
       const usersCol = collection(this.db, "user");
       const docRef = await addDoc(usersCol, user); // Add user data to Firestore
-      console.log("User added with ID:", docRef.id);
+      //console.log("User added with ID:", docRef.id);
       return { id: docRef.id, ...user }; // Return the added user with ID
     } catch (error) {
       console.error("Error adding user:", error);
@@ -120,7 +139,7 @@ class MyFireStoreHandler {
       const { id, ...skillWithoutId } = skill; // Remove ID to avoid duplication
       const docRef = await addDoc(skillsCol, skillWithoutId);
       await updateDoc(docRef, { id: docRef.id }); // Set ID after adding
-      console.log("Skill added with ID:", docRef.id);
+      //console.log("Skill added with ID:", docRef.id);
       return { id: docRef.id, ...skillWithoutId };
     } catch (error) {
       console.error("Error adding skill:", error);

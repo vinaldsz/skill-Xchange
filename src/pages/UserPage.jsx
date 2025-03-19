@@ -1,5 +1,5 @@
 import React from "react";
-import NavBar from "../components/NavBar";
+import NavBar from "../components/NavBarWithSwap";
 import SkillsList from "../components/SkillList"; // Import the SkillsList component
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap
 

@@ -38,7 +38,6 @@ export default function SkillForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Updating skill:", skillData);
 
     try {
       if (skillData.id) {
