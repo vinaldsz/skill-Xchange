@@ -1,6 +1,6 @@
 # 🎓 Skill Xchange - Skill Swap Marketplace
 
-## A collaborative platform where users can exchange skills without monetary transactions. This project fosters a community where learning is accessible, affordable, and interactive.
+A collaborative platform where users can exchange skills without monetary transactions. This project fosters a community where learning is accessible, affordable, and interactive.
 
 ## 📚 Problem Statement
 
