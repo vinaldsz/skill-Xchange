@@ -57,7 +57,10 @@ export default function SwapRequestPage() {
       <div className="skills-container">
         <div className="back arrow">
           {/* Small Back Arrow Link/Button */}
-          <button onClick={() => navigate("/user")} className="back-button">
+          <button
+            onClick={() => navigate("/user", { state: { refresh: true } })}
+            className="back-button"
+          >
             ← Back
           </button>
         </div>

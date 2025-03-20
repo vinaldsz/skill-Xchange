@@ -48,6 +48,14 @@ export default function SignIn() {
             Sign In
           </button>
         </form>
+        <div className="text-center mt-3">
+          <p>
+            Don't have an account?{" "}
+            <a href="/signup" className="text-primary">
+              Register here
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

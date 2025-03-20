@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { myDB } from "../db/myFireStore";
 import SkillCard from "./SkillCard";
 import SkillForm from "./SkillForm";
+import { useLocation } from "react-router";
 import { EmailContext } from "../contexts/EmailContext.jsx";
 
 export default function SkillsList() {
@@ -10,11 +11,11 @@ export default function SkillsList() {
   const [editingSkill, setEditingSkill] = useState(null); // Holds the skill to be edited
   const [userId, setUserId] = useState(null); // Define userId state
   const { email } = useContext(EmailContext);
+  const location = useLocation();
 
   const fetchSkills = async (userId) => {
     try {
       const allSkills = await myDB.getSkillsPromise();
-      console.log("All skills fetched:", allSkills);
       setSkills(allSkills.filter((skill) => skill.user_id === userId)); // Filter by user_id
     } catch (error) {
       console.error("Error fetching skills:", error);
@@ -23,17 +24,14 @@ export default function SkillsList() {
     }
   };
 
+  // Fetch userId when email is available
   useEffect(() => {
     if (email) {
-      // Fetch user_id based on the email
       const fetchUserId = async () => {
         try {
-          console.log("email in SkillList:", email);
           const user = await myDB.getUserByEmail(email); // Function to get user by email
           if (user) {
-            const userId = user.id; // Get user ID from the Firestore document ID
-            console.log("User ID:", userId);
-            setUserId(userId); // Set userId in state
+            setUserId(user.id); // Set userId in state
           } else {
             console.error("User not found.");
           }
@@ -44,14 +42,23 @@ export default function SkillsList() {
 
       fetchUserId();
     }
-  }, [email]); // Only re-fetch when the email changes
+  }, [email]); // Re-fetch userId when email changes
 
-  // Fetch skills only when userId is set
+  // Fetch skills when userId is set
   useEffect(() => {
     if (userId) {
       fetchSkills(userId); // Fetch skills once userId is available
     }
-  }, [userId]); // Depend on userId to trigger fetching skills
+  }, [userId]); // Only run this when userId is set
+
+  // Re-fetch skills when location.state.refresh changes or skills array is empty
+  useEffect(() => {
+    if (location.state?.refresh || skills.length === 0) {
+      if (userId) {
+        fetchSkills(userId); // Re-fetch skills when navigating back or if skills are empty
+      }
+    }
+  }, [location.state, userId, skills.length]);
 
   const handleEdit = (skill) => {
     setEditingSkill(skill); // Set the selected skill for editing

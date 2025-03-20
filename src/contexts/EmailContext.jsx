@@ -1,12 +1,23 @@
 // src/contexts/EmailContext.jsx
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useEffect, useContext } from "react";
 
-// Create the EmailContext
+// Create EmailContext
 export const EmailContext = createContext();
 
-// Create the EmailProvider component
+// Create EmailProvider
 export const EmailProvider = ({ children }) => {
-  const [email, setEmail] = useState(null); // Default email is null
+  const [email, setEmail] = useState(() => {
+    const savedEmail = localStorage.getItem("user_email");
+    return savedEmail || null;
+  });
+
+  useEffect(() => {
+    if (email) {
+      localStorage.setItem("user_email", email);
+    } else {
+      localStorage.removeItem("user_email");
+    }
+  }, [email]);
 
   const value = { email, setEmail };
 
@@ -17,5 +28,5 @@ export const EmailProvider = ({ children }) => {
 
 // Custom hook to use the EmailContext
 export const useEmail = () => {
-  return useContext(EmailContext); // Access the context in a more convenient way
+  return useContext(EmailContext);
 };

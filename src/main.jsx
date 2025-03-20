@@ -8,6 +8,7 @@ import SignInPage from "./pages/SignInPage.jsx";
 import { EmailProvider } from "./contexts/EmailContext.jsx";
 import SignUpPage from "./pages/SignUpPage.jsx";
 import SwapRequestPage from "./pages/SwapRequestPage.jsx";
+import LogOut from "./components/LogOut.jsx";
 
 import { BrowserRouter, Routes, Route } from "react-router";
 
