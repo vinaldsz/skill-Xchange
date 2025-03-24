@@ -1,6 +1,32 @@
 # 🎓 Skill Xchange - Skill Swap Marketplace
 
-## A collaborative platform where users can exchange skills without monetary transactions. This project fosters a community where learning is accessible, affordable, and interactive.
+A collaborative platform where users can exchange skills without monetary transactions. This project fosters a community where learning is accessible, affordable, and interactive.
+
+---
+
+## 📖 Table of Contents
+
+- [📚 Problem Statement](#-problem-statement)
+- [🛠️ Tech Stack](#️-tech-stack)
+  - [🎨 Frontend](#-frontend)
+  - [🔥 Backend](#-backend)
+- [CRUD Operation](#crud-operation)
+- [Figma Link](#figma-link)
+- [YouTube](#youtube)
+- [⚙️ Installation & Setup](#️-installation--setup)
+- [🧱 Functional Programming Principles](#-functional-programming-principles)
+  - [1. Pure Functions](#1-pure-functions)
+  - [2. Immutability](#2-immutability)
+  - [3. First Class Functions](#3-first-class-functions)
+  - [4. Higher Order Functions](#4-higher-order-functions)
+  - [5. Declarative Over Imperative](#5-declarative-over-imperative)
+- [🛠️ Design Patterns](#️-design-patterns)
+  - [1. Module Pattern](#1-module-pattern)
+  - [2. Context API as a Singleton](#2-context-api-as-a-singleton)
+  - [3. Component-Based Architecture as Factory Pattern](#3-component-based-architecture-as-factory-pattern)
+- [Project by](#project-by)
+
+---
 
 ## 📚 Problem Statement
 
@@ -32,6 +58,10 @@ https://www.figma.com/design/Hu3ICyqpLji3mJ9N0Y82gf/Untitled?node-id=0-1&m=dev&t
 
 ## YouTube :
 
+Demo : https://www.youtube.com/watch?v=3oRFSp9c6FA&t=1s
+
+Functional Programming Fundamentals:
+
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the Repository
@@ -40,7 +70,7 @@ https://www.figma.com/design/Hu3ICyqpLji3mJ9N0Y82gf/Untitled?node-id=0-1&m=dev&t
 git clone https://github.com/yourusername/skill-xchange.git
 cd skill-xchange
 npm install
-npm build dev
+npm run dev
 ```
 
 ## 🧱 Functional Programming Principles
