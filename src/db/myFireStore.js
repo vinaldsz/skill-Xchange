@@ -89,6 +89,50 @@ class MyFireStoreHandler {
     }
   }
 
+  // ✅ Get all swap requests from swapRequest collection
+  async getUserSwaps(userId) {
+    try {
+      console.log("Fetching swap requests...");
+      const swapCol = collection(this.db, "swapRequest");
+      const q = query(swapCol, where("requestor_id", "==", userId)); // Filter by userId
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        console.log("No swap requests found.");
+        return [];
+      }
+
+      const swapList = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log("Swap requests fetched:", swapList);
+      return swapList;
+    } catch (error) {
+      console.error("Error fetching swap requests:", error);
+      throw error;
+    }
+  }
+
+  //✅ Add this function to your MyFireStoreHandler class
+  async getSkillById(skillId) {
+    try {
+      console.log("Fetching skill by ID...");
+      const skillDoc = doc(this.db, "skills", skillId);
+      const skillSnapshot = await getDoc(skillDoc);
+
+      if (!skillSnapshot.exists()) {
+        console.log("No skill found with ID:", skillId);
+        return null;
+      }
+
+      return { id: skillSnapshot.id, ...skillSnapshot.data() };
+    } catch (error) {
+      console.error("Error getting skill by ID:", error);
+      throw error;
+    }
+  }
+
   // ✅ Get skills with caching to avoid repeated calls
   async getSkillsPromise() {
     if (this.skillsPromise) {
@@ -120,6 +164,7 @@ class MyFireStoreHandler {
     }
   }
 
+  // ✅ Create a new user in Firestore
   async addUser(user) {
     try {
       const usersCol = collection(this.db, "user");
@@ -128,6 +173,28 @@ class MyFireStoreHandler {
       return { id: docRef.id, ...user }; // Return the added user with ID
     } catch (error) {
       console.error("Error adding user:", error);
+      throw error;
+    }
+  }
+
+  // ✅ Create a new swap request in Firestore
+  async createSwapRequest(requestorId, providerId, skillId) {
+    try {
+      const swapRequest = {
+        requestor_id: requestorId,
+        provider_id: providerId,
+        skill_id: skillId,
+        status: "Pending", // Default status
+        created_at: new Date().toISOString(), // Timestamp
+      };
+
+      const docRef = await addDoc(
+        collection(this.db, "swapRequest"),
+        swapRequest
+      );
+      return { id: docRef.id, ...swapRequest };
+    } catch (error) {
+      console.error("Error creating swap request:", error);
       throw error;
     }
   }

@@ -16,7 +16,7 @@ const Logout = () => {
     setEmail(null);
 
     // Redirect to the sign-in page
-    navigate("/signin");
+    navigate("/");
   };
 
   return (

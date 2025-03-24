@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import { myDB } from "../db/myFireStore"; // Import your Firebase handler
 import { useNavigate } from "react-router";
 import "../styles/SwapRequestPage.css";
 import NavBar from "../components/NavBar";
+import { useEmail } from "../contexts/EmailContext"; // Import EmailContext to get the current user's email
 
 export default function SwapRequestPage() {
   const [skills, setSkills] = useState([]); // Store the list of skills
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { email } = useEmail(); // Get the current user's email
 
   // Fetch skills and associated user details on component mount
   useEffect(() => {
@@ -46,6 +48,33 @@ export default function SwapRequestPage() {
     fetchSkillsAndUsers();
   }, []);
 
+  // Handle Swap Request
+  const handleRequestSwap = async (skill) => {
+    try {
+      // Fetch the current user's details using their email
+      const currentUser = await myDB.getUserByEmail(email);
+
+      if (!currentUser) {
+        console.error("Current user not found.");
+        return;
+      }
+
+      // Create a new swap request
+      const newSwapRequest = await myDB.createSwapRequest(
+        currentUser.id, // Requestor ID
+        skill.user_id, // Provider ID
+        skill.id // Skill ID
+      );
+
+      console.log("Swap request created:", newSwapRequest);
+
+      // Navigate to a confirmation page or show a success message
+      navigate("/user", { state: { refresh: true } });
+    } catch (error) {
+      console.error("Error creating swap request:", error);
+    }
+  };
+
   // Show loading if still fetching
   if (loading) {
     return <div>Loading...</div>;
@@ -73,7 +102,7 @@ export default function SwapRequestPage() {
               <p>Location: {skill.userLocation}</p>
               <p>Mode: {skill.mode}</p>
               <p>Proficiency Level: {skill.proficiency_level}</p>
-              <button onClick={() => navigate(`/swap-request/${skill.id}`)}>
+              <button onClick={() => handleRequestSwap(skill)}>
                 Request Swap
               </button>
             </div>
