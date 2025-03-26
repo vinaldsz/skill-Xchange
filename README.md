@@ -20,10 +20,15 @@ A collaborative platform where users can exchange skills without monetary transa
   - [3. First Class Functions](#3-first-class-functions)
   - [4. Higher Order Functions](#4-higher-order-functions)
   - [5. Declarative Over Imperative](#5-declarative-over-imperative)
+- [Array Functions](#array-functions)
+  - [1. Using filter in SkillList.jsx](#1-using-filter-in-skilllistjsx)
+  - [2. Using map in SkillList.jsx](#2-using-map-in-skilllistjsx)
+  - [3. Using map in myFireStore.js](#3-using-map-in-myfirestorejs)
 - [🛠️ Design Patterns](#️-design-patterns)
   - [1. Module Pattern](#1-module-pattern)
   - [2. Context API as a Singleton](#2-context-api-as-a-singleton)
   - [3. Component-Based Architecture as Factory Pattern](#3-component-based-architecture-as-factory-pattern)
+- [Resources](#resources)
 - [Project by](#project-by)
 
 ---
@@ -186,6 +191,66 @@ Example: Jsx in `NavBarWithSwap.jsx`
 - The JSX syntax describes what the UI should look like based on the location.pathname condition.
 - React takes care of efficiently updating the DOM when state or props change.
 
+## Array Funtions
+
+### 1. Using filter in SkillList.jsx
+
+You use the `filter` method to create a new array of skills that belong to a specific user. This avoids modifying the original array and keeps the code declarative.
+
+```javascript
+const fetchSkills = async (userId) => {
+  try {
+    const allSkills = await myDB.getSkillsPromise();
+    setSkills(allSkills.filter((skill) => skill.user_id === userId)); // Filter by user_id
+  } catch (error) {
+    console.error("Error fetching skills:", error);
+  } finally {
+    setLoading(false);
+  }
+};
+```
+
+### Why This is Declarative:
+
+- The filter method creates a new array containing only the skills that match the user_id.
+- It avoids using a for loop or manually pushing items into a new array, which would be more imperative.
+
+### 2. Using map in SkillList.jsx
+
+You use the `map` method to render a list of SkillCard components for each skill in the skills array. This is a declarative way to transform an array into a list of React components.
+
+```jsx
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  {skills.map((skill) => (
+    <SkillCard key={skill.id} skill={skill} />
+  ))}
+</div>
+```
+
+### Why This is Declarative:
+
+- The `map` method transforms the skills array into an array of `SkillCard` components.
+- It avoids manually iterating over the array and appending elements to the DOM.
+
+### 3. map in myFireStore.js
+
+In your `myFireStore.js` file, you use the `map` method to transform Firestore documents into an array of skill objects.
+
+```javascript
+class MyFireStoreHandler {
+  async getSkillsPromise() {
+    const skillsCol = collection(this.db, "skills");
+    const snapshot = await getDocs(skillsCol);
+    return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })); // Transform Firestore docs into skill objects
+  }
+}
+```
+
+### Why This is Declarative:
+
+- The `map` method transforms the `snapshot.docs` array into an array of skill objects.
+- It avoids manually iterating over the documents and constructing the objects.
+
 ## 🛠️ Design Patterns
 
 ### 1. Module Pattern
@@ -221,6 +286,34 @@ export const myDB = new MyFireStoreHandler();
 
 Note: myFireStore.js also exibits Singleton beheavior.
 
+### Hypothetical Example
+
+```javascript
+// myFireStore.js
+export async function getSkillsPromise() {
+  const skillsCol = collection(this.db, "skills");
+  const snapshot = await getDocs(skillsCol);
+  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function addSkill(skill) {
+  const skillsCol = collection(this.db, "skills");
+  const docRef = await addDoc(skillsCol, skill);
+  return { id: docRef.id, ...skill };
+}
+
+// Another file for Firestore operations
+export async function deleteSkill(skillId) {
+  const skillDoc = doc(this.db, "skills", skillId);
+  await deleteDoc(skillDoc);
+}
+```
+
+### Why This Breaks the Module Pattern
+
+- Firestore-related operations are scattered across multiple files instead of being encapsulated in a single module.
+- There’s no central class or object to manage Firestore operations, making the code harder to maintain and reuse.
+
 ### 2. Context API as a Singleton
 
 The Singleton Pattern ensures that only one instance of a class or object is created and shared across the application. Your EmailContext implementation acts as a Singleton by providing a single shared state (email) across the entire app.
@@ -251,6 +344,39 @@ export function useEmail() {
 
 - The EmailContext provides a single shared instance of the email state and setEmail function.
 - The EmailProvider ensures that all components consuming the EmailContext share the same state.
+
+### Hypothetical Example
+
+```javascript
+// Creating multiple contexts instead of reusing the same one
+const EmailContext1 = createContext();
+const EmailContext2 = createContext();
+
+export function EmailProvider1({ children }) {
+  const [email, setEmail] = useState(null);
+
+  return (
+    <EmailContext1.Provider value={{ email, setEmail }}>
+      {children}
+    </EmailContext1.Provider>
+  );
+}
+
+export function EmailProvider2({ children }) {
+  const [email, setEmail] = useState(null);
+
+  return (
+    <EmailContext2.Provider value={{ email, setEmail }}>
+      {children}
+    </EmailContext2.Provider>
+  );
+}
+```
+
+### Why This Breaks the Module Pattern
+
+- Multiple EmailContext instances are created (EmailContext1 and EmailContext2), leading to inconsistent state across the app.
+- Components consuming EmailContext1 won’t share the same state as those consuming EmailContext2.
 
 ### 3. Component-Based Architecture as Factory Pattern
 
@@ -294,11 +420,52 @@ function BasicExample() {
 - The NavBarWithSwap component acts as a factory for creating different UI elements (e.g., "Swap Skills" and "Logout" links or "Sign In" and "Sign Up" links) based on the current route (location.pathname).
 - It abstracts the logic for creating these elements, making the component reusable and dynamic.
 
+### Hypothetical Example
+
+```javascript
+function NavBarWithSwap() {
+  const location = useLocation();
+
+  if (location.pathname === "/user") {
+    return (
+      <Navbar>
+        <Nav.Link href="/swapreq">Swap Skills</Nav.Link>
+        <Logout />
+      </Navbar>
+    );
+  } else if (location.pathname === "/signin") {
+    return (
+      <Navbar>
+        <Nav.Link href="/signin">Sign In</Nav.Link>
+        <Nav.Link href="/signup">Sign Up</Nav.Link>
+      </Navbar>
+    );
+  } else {
+    return (
+      <Navbar>
+        <Nav.Link href="/">Home</Nav.Link>
+      </Navbar>
+    );
+  }
+}
+```
+
+### Why This Breaks the Module Pattern
+
+- The logic for creating different UI elements is hardcoded and repetitive.
+- There’s no abstraction or reuse of the logic for creating Nav.Link components.
+
 ## Resources:
 
 Design Patterns: https://refactoring.guru/design-patterns/factory-method
 React Bootstrap: https://react-bootstrap.github.io/docs/components/navbar
 Referenced Projects: https://github.com/john-guerra/reactFirestore-project-analyzer
 React.js: https://react.dev/learn
+
+## Deployement
+
+Firebase hosting is used.
+
+link: https://skill-exchange-73c3c.web.app/
 
 ## Project by : Vinal Dalcy Dsouza
