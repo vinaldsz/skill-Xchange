@@ -59,6 +59,7 @@ https://www.figma.com/design/Hu3ICyqpLji3mJ9N0Y82gf/Untitled?node-id=0-1&m=dev&t
 ## YouTube :
 
 Demo : https://www.youtube.com/watch?v=3oRFSp9c6FA&t=1s
+Principles and Design Patterns: https://youtu.be/ZWIdvY57jUc
 
 Functional Programming Fundamentals:
 
@@ -106,18 +107,16 @@ const handleLogout = () => {
 
 Immutability means that data is not modified directly. Instead, new copies of data are created when changes are needed.
 
-Example `setSkillData` in `SkillForm.jsx`
+Example `setSkill in `SkillList.jsx`
 
 ```javascript
-const handleChange = (e) => {
-  setSkillData({ ...skillData, [e.target.name]: e.target.value });
-};
+setSkills(allSkills.filter((skill) => skill.user_id === userId));
 ```
 
 #### Why it demonstrates immutability:
 
-- The setSkillData function creates a new object using the spread operator ({ ...skillData }) instead of modifying the existing skillData object directly.
-- This ensures that the original state remains unchanged.
+- The filter method creates a new array without modifying the original allSkills array.
+- The setSkills function updates the state with the new array, leaving the original data intact.
 
 ### 3. First Class Functions
 
@@ -158,6 +157,8 @@ useEffect(() => {
 - The useEffect hook is a higher-order function because it takes a callback function as its argument.
 - The callback function (() => fetchSkills(userId)) is executed when the userId dependency changes.
 
+Note: Array functions like `filter` and `map` used in this project are also higher order functions.
+
 ### 5. Declarative Over Imperative
 
 Declarative programming focuses on what to do rather than how to do it. React itself is declarative because you describe the UI structure and let React handle the DOM updates.
@@ -183,7 +184,7 @@ Example: Jsx in `NavBarWithSwap.jsx`
 #### Why it demonstrates declarative programming:
 
 - The JSX syntax describes what the UI should look like based on the location.pathname condition.
-- React handles the underlying DOM manipulation, so you don’t need to write imperative code to show or hide elements.
+- React takes care of efficiently updating the DOM when state or props change.
 
 ## 🛠️ Design Patterns
 
@@ -292,5 +293,12 @@ function BasicExample() {
 
 - The NavBarWithSwap component acts as a factory for creating different UI elements (e.g., "Swap Skills" and "Logout" links or "Sign In" and "Sign Up" links) based on the current route (location.pathname).
 - It abstracts the logic for creating these elements, making the component reusable and dynamic.
+
+## Resources:
+
+Design Patterns: https://refactoring.guru/design-patterns/factory-method
+React Bootstrap: https://react-bootstrap.github.io/docs/components/navbar
+Referenced Projects: https://github.com/john-guerra/reactFirestore-project-analyzer
+React.js: https://react.dev/learn
 
 ## Project by : Vinal Dalcy Dsouza
